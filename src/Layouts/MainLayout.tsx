@@ -12,8 +12,9 @@ import {
 import { IconHome } from "@tabler/icons-react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
+import { Header } from "./Header";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -29,8 +30,10 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const isPublicPage = router.pathname === "/home";
   const isAuthPage =
     router.pathname === "/auth/login" || router.pathname === "/auth/register"; // 💡 МУИС-ийн төвийн зураг гэж үзэн, та өөрийн зургаар солино уу.
-  const NUM_BANNER_IMAGE = "https://news.num.edu.mn/wp-content/uploads/2015/01/muis2.png"; // Та өөрийн зургаа public/images дотор байрлуулна. // 1. Ачааллах төлөв
-
+  const NUM_BANNER_IMAGE =
+    "https://news.num.edu.mn/wp-content/uploads/2015/01/muis2.png"; // Та өөрийн зургаа public/images дотор байрлуулна. // 1. Ачааллах төлөв
+  const [sidebarOpened, setSidebarOpened] = useState(false);
+  const toggleSidebar = () => setSidebarOpened((o) => !o);
   if (isLoading) {
     return (
       <Center className="min-h-screen bg-indigo-50">
@@ -62,9 +65,18 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       <Head>
         <title>МУИС | Өрөө Захиалгын Систем</title>
       </Head>
-      <Navbar />
+      <Navbar
+        opened={isAuthenticated ? sidebarOpened : false}
+        onBurgerClick={isAuthenticated ? toggleSidebar : undefined}
+      />
       <div className="flex pt-16">
-        {isAuthenticated && <Sidebar />} {" "}
+        {isAuthenticated && (
+          <Sidebar
+            opened={sidebarOpened}
+            onClose={() => setSidebarOpened(false)}
+          />
+        )}
+         {" "}
         <main
           className={`flex-grow w-full transition-all duration-300 ${
             isAuthenticated ? "md:ml-64" : "mx-auto"
@@ -94,7 +106,11 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
                   >
                     МУИС-ийн Өрөө Захиалгын Систем
                   </Title>
-                  <Text c={'white'} fw={700} className="text-indigo-200 text-base md:text-xl drop-shadow-md max-w-2xl">
+                  <Text
+                    c={"white"}
+                    fw={700}
+                    className="text-indigo-200 text-base md:text-xl drop-shadow-md max-w-2xl"
+                  >
                     Хурал, уулзалт, семинарын өрөөнүүдийг хурдан, хялбар
                     захиалаарай.
                   </Text>
@@ -120,7 +136,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
       </div>
       {/* 4.4. Footer (МУИС-ийн өнгөөр) */}
       <footer className="w-full p-4 bg-indigo-700 text-center text-sm mt-0">
-        <Text c={'white'}>
+        <Text c={"white"}>
           NATIONAL UNIVERSITY OF MONGOLIA | © {new Date().getFullYear()} Өрөө
           Захиалгын Систем.
         </Text>
